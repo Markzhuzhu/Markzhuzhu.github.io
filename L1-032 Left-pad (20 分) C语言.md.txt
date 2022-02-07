@@ -1,0 +1,79 @@
+﻿# 一、题目
+
+> 根据新浪微博上的消息，有一位开发者不满NPM（Node Package Manager）的做法，收回了自己的开源代码，其中包括一个叫left-pad的模块，就是这个模块把javascript里面的React/Babel干瘫痪了。这是个什么样的模块？就是在字符串前填充一些东西到一定的长度。例如用*去填充字符串GPLT，使之长度为10，调用left-pad的结果就应该是******GPLT。Node社区曾经对left-pad紧急发布了一个替代，被严重吐槽。下面就请你来实现一下这个模块。
+> 
+> 
+**输入格式：**
+> 输入在第一行给出一个正整数N（≤104）和一个字符，分别是填充结果字符串的长度和用于填充的字符，中间以1个空格分开。第二行给出原始的非空字符串，以回车结束。
+
+
+**输出格式：**
+
+>在一行中输出结果字符串。
+
+**输入样例1：**
+15 _
+I love GPLT
+
+**输出样例1：**
+
+____I love GPLT
+
+
+**输入样例2：**
+
+4 *
+this is a sample for cut
+
+
+**输出样例2：**
+
+ cut
+
+
+ 
+
+# 二、解决方案
+# 1.思路
+①我们观察样例可以发现字符串长度不足便补符号，如果超出则从字符串长度-N处开始打印
+②这道题注意字符串中有空格，所以我们不能用scanf函数读取，因为他遇到空格和回车会结束，所以应该使用gets（）函数，但注意他会遇到回车停止，所以我们要在scanf与gets之间加一个getchar（）函数，把我们输入的回车给读取掉。
+③至于数组为什么至少要为40000我也不清楚，csdn当时也没查到，我一开始用的10000，过不了。
+
+——————————————
+# 2.代码
+
+```c
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <string.h>
+int main()
+{
+	int n = 0;
+	char str[40001];
+	char c;
+	scanf("%d %c", &n, &c);
+	getchar();
+	gets(str);
+	int len = strlen(str);
+	if (n > len)
+	{
+		for (int i = 0; i < n-len; i++)
+		{
+			printf("%c", c);
+		}
+		for (int j = 0; j < len; j++)
+		{
+			printf("%c", str[j]);
+		}
+	}
+	if (n <= len)
+	{
+		for (int i = len - n; i < len; i++)
+		{
+			printf("%c", str[i]);
+		}
+	}
+	return 0;
+}
+```
+

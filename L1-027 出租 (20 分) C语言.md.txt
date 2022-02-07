@@ -1,0 +1,114 @@
+﻿# 一、题目
+
+> 下面是新浪微博上曾经很火的一张图：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/3b39302227684587840c9c227995ceac.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5rSbOTA3,size_20,color_FFFFFF,t_70,g_se,x_16)
+> 
+> 
+> 
+> 一时间网上一片求救声，急问这个怎么破。其实这段代码很简单，index数组就是arr数组的下标，index[0]=2 对应
+> arr[2]=1，index[1]=0 对应 arr[0]=8，index[2]=3 对应 arr[3]=0，以此类推……
+> 很容易得到电话号码是18013820100。
+> 
+> 本题要求你编写一个程序，为任何一个电话号码生成这段代码 —— 事实上，只要生成最前面两行就可以了，后面内容是不变的。
+> 
+> 
+**输入格式：**
+> 输入在一行中给出一个由11位数字组成的手机号码。
+
+
+**输出格式：**
+
+> 为输入的号码生成代码的前两行，其中arr中的数字必须按递减顺序给出。
+
+
+**输入样例1：**
+
+18013820100
+
+**输出样例1：**
+
+int[] arr = new int[]{8,3,2,1,0};
+int[] index = new int[]{3,0,4,3,1,0,2,4,3,4,4};
+
+
+
+
+
+ 
+
+# 二、解决方案
+# 1.思路
+①按照题目要求我们首先要给手机号码去重，这里比较简单，之后按照题目要求要对去重后的数字从大到小排序，我们用快排qsort函数，具体用法可以csdn查一下
+②之后我们就要在index数组（原电话号码）中把每一个数字在去重数组str1中的下标找出并打印出即可
+③注意题目的打印形式
+
+——————————————
+# 2.代码
+
+```c
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+int cmp(const void* a, const void* b)
+{
+	return (strcmp((char*)b, (char*)a));
+}
+int main()
+{
+	char str1[15] = { 0 };
+	scanf("%s", str1);
+	char index[15] = { 0 };
+	int k = 0;
+	int len = strlen(str1);
+	for (int i = 0; i < 11; i++)
+	{
+		index[i] = str1[i];
+	}
+	for (int i = 0; i <=len-1; i++)
+	{
+		for (int j = i + 1; j <=len-1; j++)
+		{
+			if (str1[i] == str1[j])
+			{
+				for (k = j; k <= len-1; k++)
+				{
+					str1[k] = str1[k + 1];
+				}
+				len--;
+                j--;
+			}
+		}
+	}
+	str1[len] = '\0';
+	qsort(str1, len, sizeof(str1[0]), cmp);
+	printf("int[] arr = new int[]{");
+	for (int i = 0; i < len-1; i++)
+	{
+		printf("%c,",str1[i]);
+	}
+	printf("%c};\n", str1[len - 1]);
+	printf("int[] index = new int[]{");
+	for (int i = 0; i < strlen(index)-1; i++)
+	{
+		for (int j = 0; j < len; j++)
+		{
+			if (index[i] == str1[j])
+			{
+				printf("%d,", j);
+			}
+		}
+	}
+	for (int j = 0; j < len; j++)
+	{
+		if (index[strlen(index) - 1] == str1[j])
+		{
+			printf("%d};", j);
+		}
+	}
+	return 0;
+}
+```
+
+
+
