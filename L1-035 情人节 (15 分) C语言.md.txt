@@ -1,0 +1,106 @@
+﻿# 一、题目
+
+> ![!\[当芸芸众生忙着在朋友圈中发照片的时候，总有一些人因为太帅而没有朋友。本题就要求你找出那些帅到没有朋友的人。\](https://img-blog.csdnimg.cn/ec0ec160eb19419a8cbdc8d9d681d5cf.png）](https://img-blog.csdnimg.cn/d85b1853df7c49388adf6f16a723b4e2.png)以上是朋友圈中一奇葩贴：“2月14情人节了，我决定造福大家。第2个赞和第14个赞的，我介绍你俩认识…………咱三吃饭…你俩请…”。现给出此贴下点赞的朋友名单，请你找出那两位要请客的倒霉蛋。
+
+
+
+**输入格式：**
+> 输入按照点赞的先后顺序给出不知道多少个点赞的人名，每个人名占一行，为不超过10个英文字母的非空单词，以回车结束。一个英文句点.标志输入的结束，这个符号不算在点赞名单里。
+
+**输出格式：**
+
+> 根据点赞情况在一行中输出结论：若存在第2个人A和第14个人B，则输出“A and B are inviting you to dinner...”；若只有A没有B，则输出“A is the only one for you...”；若连A都没有，则输出“Momo... No one is for you ...”。
+
+
+**输入样例1：**
+GaoXZh
+Magi
+Einst
+Quark
+LaoLao
+FatMouse
+ZhaShen
+fantacy
+latesum
+SenSen
+QuanQuan
+whatever
+whenever
+Potaty
+hahaha
+.
+
+**输出样例1：**
+
+Magi and Potaty are inviting you to dinner...
+
+
+**输入样例2：**
+
+LaoLao
+FatMouse
+whoever
+.
+
+
+**输出样例2：**
+
+FatMouse is the only one for you...
+
+**输入样例3：**
+LaoLao
+.
+
+**输出样例3：**
+Momo... No one is for you ...
+
+ 
+
+# 二、解决方案
+# 1.思路
+①这道题首先需要注意的就是当输入.时停止，否则一直在输入，这里我们就用strcmp（）函数，相同时返回0的特点。
+
+```c
+while (scanf("%s", &name) && strcmp(name, ".") != 0)
+```
+②我们不要管输入的名字有多少，直接注意第二个和第14个名字即可，把这两个名字记录下来（因为最后要打印这两个名字），我们可以使用strcpy这个函数，把我们要的名字保存下来即可。
+
+——————————————
+# 2.代码
+
+```c
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <string.h>
+int main()
+{
+	char name[15], A[15], B[15];
+	int count = 0;
+	while (scanf("%s", &name) && strcmp(name, ".") != 0)
+	{
+		count++;
+		if (count == 2)
+		{
+			strcpy(A, name);
+		}
+		if (count == 14)
+		{
+			strcpy(B, name);
+		}
+	}
+	if (count >= 14)
+	{
+		printf("%s and %s are inviting you to dinner...",A,B);
+	}
+	else if (count >= 2)
+	{
+		printf("%s is the only one for you...", A);
+	}
+	else
+	{
+		printf("Momo... No one is for you ...");
+	}
+	return 0;
+}
+```
+
