@@ -1,0 +1,82 @@
+﻿# 一、题目
+
+> 本题的目标很简单，就是判断一个给定的正整数是否素数。
+> 
+> 
+**输入格式：**
+>输入在第一行给出一个正整数N（≤ 10），随后N行，每行给出一个小于231的需要判断的正整数。
+
+
+**输出格式：**
+
+> 对每个需要判断的正整数，如果它是素数，则在一行中输出Yes，否则输出No。
+
+
+**输入样例1：**
+2
+11
+111
+
+**输出样例1：**
+
+Yes
+No
+
+
+
+
+ 
+
+# 二、解决方案
+# 1.思路
+①我们判断是不是素数就是看这个数除了1和他本身外能否整除其他数，用sqrt（）函数开方后试除即可
+②注意1不是素数！
+
+——————————————
+# 2.代码
+
+```c
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <math.h>
+int is_prime(int x)
+{
+	int k = 1;
+	for (int i = 2; i <= sqrt(x) ; i++)
+	{
+		if (x % i == 0)
+		{
+			k = 2;
+			break;
+		}
+	}
+	return k;
+}
+int main()
+{
+	int n = 0;
+	scanf("%d", &n);
+	int arr[10] = { 0 };
+	for (int i = 0; i < n; i++)
+	{
+		scanf("%d", &arr[i]);
+	}
+	for (int i = 0; i < n; i++)
+	{
+		if (arr[i] == 1)
+		{
+			printf("No\n");
+		}
+		else
+		{
+			int j = is_prime(arr[i]);
+			if (j == 1)
+				printf("Yes\n");
+			else
+				printf("No\n");
+		}
+	}
+	return 0;
+}
+```
+

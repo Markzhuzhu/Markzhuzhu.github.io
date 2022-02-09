@@ -1,0 +1,38 @@
+﻿# 一、题目
+
+> 这道超级简单的题目没有任何输入。
+你只需要在第一行中输出程序员钦定名言“Hello World”，并且在第二行中输出更新版的“Hello New World”就可以了。
+> 
+> 
+**输入格式：**
+> 无
+
+
+
+**输出格式：**
+
+> Hello World
+Hello New World
+
+
+
+ 
+
+# 二、解决方案
+# 1.思路
+①直接输入即可。
+
+——————————————
+# 2.代码
+
+```c
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+int main()
+{
+	printf("Hello World\n");
+	printf("Hello New World\n");
+	return 0;
+}
+```
+
