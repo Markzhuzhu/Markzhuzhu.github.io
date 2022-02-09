@@ -1,0 +1,90 @@
+﻿# 一、题目
+
+> 大家应该都会玩“锤子剪刀布”的游戏：两人同时给出手势，胜负规则如图所示：![在这里插入图片描述](https://img-blog.csdnimg.cn/c0eb9d9519be405db68ae8d60032e9c9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5rSbOTA3,size_12,color_FFFFFF,t_70,g_se,x_16)现要求你编写一个稳赢不输的程序，根据对方的出招，给出对应的赢招。但是！为了不让对方输得太惨，你需要每隔K次就让一个平局。
+
+
+
+**输入格式：**
+>输入首先在第一行给出正整数K（≤10），即平局间隔的次数。随后每行给出对方的一次出招：ChuiZi代表“锤子”、JianDao代表“剪刀”、Bu代表“布”。End代表输入结束，这一行不要作为出招处理。
+
+
+**输出格式：**
+
+> 对每一个输入的出招，按要求输出稳赢或平局的招式。每招占一行。
+
+
+**输入样例1：**
+2
+ChuiZi
+JianDao
+Bu
+JianDao
+Bu
+ChuiZi
+ChuiZi
+End
+
+**输出样例1：**
+
+Bu
+ChuiZi
+Bu
+ChuiZi
+JianDao
+ChuiZi
+Bu
+
+
+
+ 
+
+# 二、解决方案
+# 1.思路
+①题目要求我们输入遇到End才能停止，所以我们就用`while (scanf("%s",str)!= EOF)`一直输入然后每次用strcmp（）函数与End比较。
+②题目要我们一直赢，所以我们就用if语句对应相应的输出即可，但是注意确定一个变量count，每两句我们就要平局一次，每次平局后我们再让count=0.
+
+——————————————
+# 2.代码
+
+```c
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <string.h>
+int main()
+{
+	int n = 0;
+	char str[10];
+	scanf("%d", &n);
+	int count = 0;
+	while (scanf("%s",str)!= EOF)
+	{
+		if (strcmp(str, "End") == 0)
+			break;
+		if (count == n)
+		{
+			printf("%s\n", str);
+			count = 0;
+		}
+		else
+		{
+			if (str[0] == 'C')
+			{
+				printf("Bu\n");
+				count++;
+			}
+			if (str[0] == 'B')
+			{
+				printf("JianDao\n");
+				count++;
+			}
+			if (str[0] == 'J')
+			{
+				printf("ChuiZi\n");
+				count++;
+			}
+		}
+	}
+	return 0;
+}
+```
+
