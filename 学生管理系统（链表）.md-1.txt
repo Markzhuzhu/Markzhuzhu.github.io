@@ -1,0 +1,395 @@
+﻿
+
+@[TOC](文章目录)
+
+</font>
+
+<hr style=" border:solid; width:100px; height:1px;" color=#000000 size=1">
+
+# 前言
+
+链表的学生管理系统相比之前更高效，同样有内存的扩充，也补充了文件操作，让我们输入的数据能够保存在文本里，实现我们想要的结果。
+
+
+# 一、具体过程
+## 1.引入头文件contact.h
+
+```c
+//默认存放3个人的信息，进行扩容时，每次增加2个空间
+
+#define DEFAULT_SZ 3//默认容量大小
+#define MAX_NAME 20
+#define MAX_SEX 5
+#define MAX_TELE 12
+#define MAX_ADDR 30
+#define MAX_NUM  10
+#define MAX_BIRTH 20
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+enum Option
+{
+	EXIT,
+	ADD,
+	DEL,
+	SEARCH,
+	MODIFY,
+	SHOW,
+	SORT,
+	SAVE
+};
+typedef struct Node
+{
+	char num[MAX_NUM];//学号
+	char name[MAX_NAME];//姓名
+	char sex[MAX_SEX];//性别
+	char class[MAX_BIRTH];//班级
+	char addr[MAX_ADDR];//宿舍号
+	int score;//成绩
+
+	struct Node* next;
+}node;
+node list;//链表
+void Add();
+void Show();
+void Delete();//删除指定的联系人
+void Search();
+node* Find(node* m, char n[]);
+void Modify();
+void Sort();
+int Save();//保存
+int Load();
+int sort_function(node e1, node e2);
+void del_function(node* i);
+
+```
+
+
+
+## 2.创建test.c
+这里完成我们的主体内容
+头文件引我们自己创建的contact.h
+
+<font color=#999AAA >代码如下（示例）：
+
+
+
+
+```c
+#include "function.h"
+void menu()
+{
+	printf("****************************************\n");
+	printf("******     1.add        2.del     ******\n");
+	printf("******     3.search     4.modify  ******\n");
+	printf("******     5.show       6.sort    ******\n");
+	printf("******     7.save       0.exit    ******\n");
+	printf("****************************************\n");
+}
+int main()
+{
+	int input = 0;
+	Load(&list);
+	do
+	{
+		menu();
+		printf("请选择：>");
+		scanf_s("%d", &input);
+		switch (input)
+		{
+		case ADD:
+			Add(&list);
+			break;
+		case DEL:
+			Del(&list);
+			break;
+		case SEARCH:
+			Search(&list);
+			break;
+		case MODIFY:
+			Modify(&list);
+			break;
+		case SHOW:
+			Show(&list);
+			break;
+		case SORT:
+			Sort(&list);
+			break;
+		case SAVE:
+			Save;
+			break;
+		case EXIT:
+			Save(&list);
+			printf("退出学生管理系统\n");
+			break;
+		default:
+			printf("输入错误\n");
+			break;
+		}
+	} while (input);
+	return 0;
+}
+```
+
+
+然后，重点来了，接下来就是我们每个部分的函数部分。
+  
+
+## 3.创建contact.c
+这里就重点完成我们的函数部分，话不多说，直接上代码
+开始也是先引我们自己的contact.h头文件
+
+
+```c
+#include "function.h"
+int Load(node* p)
+{
+	FILE* pfread = fopen("contact.data", "rb");
+	if (pfread == NULL)
+	{
+		printf("LoadContact: %s\n", strerror(errno));
+		return 0;
+	}
+	node j;
+	node* k;
+	node* l = p;
+	while (fscanf(pfread,"%s %s %s %s %s %d", j.num, j.name, j.sex, j.class, j.addr, &j.score)!=EOF)
+	{
+		k = (node*)malloc(sizeof(node));
+		*k = j;
+
+		l->next = k;
+		l = k;
+		l->next = NULL;
+	}
+	return 1;
+}
+void Add(node* L)
+{
+	node s;//结点
+	node* st = L;
+	printf("请输入学号:>");
+	scanf("%s", s.num);
+	printf("请输入名字:>");
+	scanf("%s", s.name);
+	printf("请输入性别:>");
+	scanf("%s", s.sex);
+	printf("请输入班级:>");
+	scanf("%s", s.class);
+	printf("请输入宿舍号:>");
+	scanf("%s", s.addr);
+	printf("请输入成绩:>");
+	scanf("%d", &s.score);
+	node* p = (node*)malloc(sizeof(node));
+	*p = s;//输入的数据
+	p->next = st->next;
+	st->next = p;//头插法
+	Save(L);
+	printf("添加成功\n");
+}
+
+
+void Show(node* L)
+{
+	node* p = L->next;
+	printf("________________________________________________________________\n");
+	printf("|学号\t|姓名\t|性别\t|班级\t|宿舍号\t|成绩\t|\n");
+	printf("________________________________________________________________\n");
+	if (p != NULL)
+	{
+		while (p != NULL)
+		{
+			printf("________________________________________________________________\n");
+			printf("%s|%s\t|%s\t|%s\t|%s\t|%d\t|\n", p->num, p->name, p->sex, p->class, p->addr,p->score);
+			printf("________________________________________________________________\n");
+			p = p->next;
+		}
+	}
+}
+
+void Search(node* o)
+{
+	char Num[MAX_NUM];
+	printf("请输入你想要查找人的学号：");
+	scanf("%s", Num);
+	node* u = Find(o,Num);
+	if (u == NULL)
+	{
+		printf("查无此人！\n");
+	}
+	else
+	{
+		u = u->next;
+		printf("%20s\t %10s\t %10s\t %10s\t %15s\t %10s\n", "学号", "名字", "性别", "班级", "宿舍号", "成绩");
+		printf("%21s\t %10s\t %10s\t %9s\t %18s\t %10s\n",
+				u->num,
+				u->name,
+				u->sex,
+				u->class,
+				u->addr,
+				u->score
+			);
+	}
+}
+node* Find(node* m, char n[])
+{
+	node* p = m;
+	while (p->next != NULL)
+	{
+		if (strcmp(p->next->num, n) == 0)
+		{
+			return p;
+		}
+		p = p->next;
+	}
+	return NULL;
+}
+
+void Del(node *L) 
+{
+	char Num[MAX_NUM];
+	printf("请输入你想要删除的人的学号：");
+	scanf("%s", Num);
+	node* u = Find(L, Num);
+	node* z = u;
+	if (u == NULL)
+	{
+		printf("要删除的人不存在！\n");
+	}
+	else
+	{
+		u = u->next;
+		printf("%20s\t %10s\t %10s\t %10s\t %15s\t %10s\n", "学号", "名字", "性别", "班级", "宿舍号", "成绩");
+		printf("%21s\t %10s\t %10s\t %9s\t %18s\t %10d\n", u->num, u->name, u->sex, u->class, u->addr, u->score);
+
+		del_function(z);
+		Save(L);
+		printf("删除成功\n");
+	}
+}
+void del_function(node* i)
+{
+	node* j = i->next;
+	i->next = j->next;
+	j->next = NULL;
+	free(j);
+}
+void Modify(node* i)
+{
+	char Num[MAX_NUM];
+	printf("请输入你想要查找人的学号：");
+	scanf("%s", Num);
+	node* u = Find(i, Num);
+	if (u == NULL)
+	{
+		printf("查无此人！\n");
+	}
+	else
+	{
+		u = u->next;
+		printf("%20s\t %10s\t %10s\t %10s\t %15s\t %10s\n", "学号", "名字", "性别", "班级", "宿舍号", "成绩");
+		printf("%21s\t %10s\t %10s\t %9s\t %18s\t %10d\n", u->num, u->name, u->sex, u->class, u->addr, u->score);
+		printf("*******  1 -------修改学号   *******\n");
+		printf("*******  2 -------修改姓名   *******\n");
+		printf("*******  3 -------修改性别   *******\n");
+		printf("*******  4 -------修改班级   *******\n");
+		printf("*******  5 -------修改宿舍号 *******\n");
+		printf("*******  6 -------修改成绩   *******\n");
+		int  m = 0;
+		while (1)
+		{
+			printf("请选择你要修改的信息：");
+			scanf("%d", &m);
+			switch (m)
+			{
+			case 1:
+				printf("学号：");
+				scanf("%s", u->num);
+				break;
+			case 2:
+				printf("姓名：");
+				scanf("%s", u->name);
+				break;
+			case 3:
+				printf("性别：");
+				scanf("%s", u->sex);
+				break;
+			case 4:
+				printf("班级：");
+				scanf("%s", u->class);
+				break;
+			case 5:
+				printf("宿舍号：");
+				scanf("%s", u->addr);
+				break;
+			case 6:
+				printf("成绩：");
+				scanf("%d", &u->score);
+				break;
+			}
+			printf("是否要继续修改？yes（1）/no（0）：");
+			scanf("%d", &m);
+			if (m == 0)
+			{
+				break;
+			}
+		}
+	}
+	Save(i);
+}
+
+
+int Save(node* p)
+{
+	FILE* pfWrite = fopen("contact.data", "wb");
+	if (pfWrite == NULL)
+	{
+		printf("SaveContact: %s\n", strerror(errno));
+		return 0;
+	}
+	//写系统中的数据到文件中
+	node* t = p->next;
+	while (t != NULL)
+	{
+		fprintf(pfWrite,"%s %s %s %s %s %d\n", t->num,t->name, t->sex, t->class, t->addr, t->score);
+		t = t->next;
+	}
+	printf("保存成功\n");
+	return 1;
+}
+void Sort(node* L)
+{
+	printf("按成绩从高到底排序");
+	for (node* j = L->next; j != NULL; j = j->next)
+	{
+		for (node* k = j; k != NULL; k = k->next)
+		{
+			if (sort_function(*j, *k) != 0)
+			{
+				node m = *j;
+				*j = *k;
+				*k = m;
+
+				m.next = j->next;
+				j->next = k->next;
+				k->next = m.next;
+			}
+		}
+	}
+	Save(L);
+}
+int sort_function(node e1, node e2)
+{
+	return e1.score < e2.score;
+}
+```
+
+# 二、写在最后
+链表版的管理系统如上，有什么不足的地方欢迎大家指出！
+![在这里插入图片描述](https://img-blog.csdnimg.cn/746e88e339974aecbf14797f71c558fc.gif#pic_center)
+
+
+
+
+
