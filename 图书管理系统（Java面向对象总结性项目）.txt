@@ -1,0 +1,576 @@
+﻿
+
+
+---
+
+
+
+@[TOC](文章目录)
+
+---
+
+# 前言
+
+
+这个图书管理系统中包含了Java目前所学到的继承多态等等知识，是对Java面向对象部分的总结，不足之处还望多多包涵。
+
+
+---
+
+
+
+# 一、图书管理系统的总体框架是什么？
+
+
+## 1.管理员的操作
+> 我们有两个主体部分就是管理员可以进行的操作，以及当读者需要借阅时的操作，我们要完成如下内容。![在这里插入图片描述](https://img-blog.csdnimg.cn/7bac0e9a94654fd489a3081980c4a21c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5rSbOTA3,size_20,color_FFFFFF,t_70,g_se,x_16)
+## 2.普通用户的操作
+> 不同的用户身份不同进行的操作也就是不同的。![在这里插入图片描述](https://img-blog.csdnimg.cn/68db5d991e524c32839c8104d9c2eec4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5rSbOTA3,size_20,color_FFFFFF,t_70,g_se,x_16)
+
+
+
+# 二、具体的实现过程
+## 1.创建关于书的一个包
+
+
+> 
+> 这个包中创建两个javaclass文件，分别是book——每一本书的信息
+> 和booklist——书架，里面储存所有的图书
+> ![这里是引用](https://img-blog.csdnimg.cn/1e77d88afa754d319aa79d78494a7d49.png)
+### ①book类的具体实现
+> 在这里我们要有每一本书的信息，比如书名、作者、价格、类型、等等属性，并且要重新写一个这个book类的构造函数，**用鼠标右键generate，一键添加构造方法（Constructor），并且添加构造方法中所有属性的getter与setter方法，以及重写我们的tostring方法，以便于我们将来的打印**，**具体代码如下**
+> ![在这里插入图片描述](https://img-blog.csdnimg.cn/70ed4be694a6418eb571b50d4a29a2f5.png)
+
+
+```java
+package book;
+
+public class Book {
+    private String name;//书名
+    private String author;//作者
+    private int price;//价格
+    private String type;//类型
+    private boolean isBorrowed;//是否被借出,默认是未借出的
+
+    public Book(String name, String author, int price, String type) {
+        this.name = name;
+        this.author = author;
+        this.price = price;
+        this.type = type;
+    }
+
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public int getPrice() { return price;}
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public boolean isBorrowed() {
+        return isBorrowed;
+    }
+
+    public void setBorrowed(boolean borrowed) {
+        isBorrowed = borrowed;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", price=" + price +
+                ", type='" + type + '\'' +
+                ((isBorrowed == true)?" 已借出":" 未借出")+
+                '}';
+    }
+}
+
+```
+
+---
+### ②booklist类的具体实现
+
+> 我们先初始给定书架的大小为10，并且先初始化给书架里放三本书，这里我们先暂时不考虑书架的扩容问题，并且里面包含4个方法，分别是getUsedSize（获取当前数组中书的个数），setUsedSize（修改当前数组中书的个数），getPos（获取下标为pos的书的信息），setBooks（下标为pos处的位置添加一本书），具体代码如下
+
+
+```java
+package book;
+//书架类
+public class BookList {
+    private Book[] books = new Book[10];//这个书架的大小
+    private int usedSize;//数组中放了几本书
+    public BookList() {
+        books[0] = new Book("三国演义","罗贯中",90,"小说");
+        books[1] = new Book("西游记","吴承恩",78,"小说");
+        books[2] = new Book("红楼梦","曹雪芹",89,"小说");
+        this.usedSize = 3;
+    }
+
+    /**
+     * 获取当前数组中元素的个数
+     * @return
+     */
+    public int getUsedSize() {
+        return usedSize;
+    }
+
+    /**
+     * 修改当前数组中元素的个数
+     * @param usedSize
+     */
+    public void setUsedSize(int usedSize) {
+        this.usedSize = usedSize;
+    }
+
+    /**
+     * 获取下标为pos的书
+     * @param pos
+     * @return
+     */
+    public Book getPos(int pos) {
+        return books[pos];
+    }
+
+    /**
+     * 在下标pos位置添加一本书
+     * @param pos
+     * @param book
+     */
+    public void setBooks(int pos,Book book) {
+        books[pos] = book;
+    }
+
+
+}
+
+```
+---
+
+## 2.创建operation的一个包
+**在此实现我们具体的每个功能，创建相应的javaclass文件**
+
+> ![在这里插入图片描述](https://img-blog.csdnimg.cn/3c195bde7f2242dabea476c5dbfb5dcf.png)
+
+
+###  ①实现IOperation接口
+
+> 因为在每一个javaclass我们都要实现work这个方法，操作的对象都是booklist，我们我们可以实现一个接口，让每一个javaclass文件都声明自己使用这个公共的接口，降低代码的耦合度
+
+
+```java
+package operation;
+
+import book.BookList;
+
+public interface IOperation {
+    void work(BookList bookList);
+}
+
+```
+---
+### ②增加图书（AddOperation）
+
+```java
+package operation;
+
+import book.Book;
+import book.BookList;
+
+import java.util.Scanner;
+
+public class AddOperation implements IOperation {
+    public void work(BookList bookList){
+        System.out.println("新增图书！");
+        System.out.println("请输入图书的名字：");
+        Scanner scan = new Scanner(System.in);
+        String name = scan.nextLine();
+        System.out.println("请输入图书的作者：");
+        String author = scan.nextLine();
+        System.out.println("请输入图书的类型：");
+        String type = scan.nextLine();
+        System.out.println("请输入图书的价格：");
+        int price = scan.nextInt();
+        Book book = new Book(name,author,price,type);
+        int currentSize = bookList.getUsedSize();
+        bookList.setBooks(currentSize,book);
+        //以当前书的个数为下标增加这本书
+        bookList.setUsedSize(currentSize+1);
+        //然后将书的总数+1
+        System.out.println("新增成功！");
+    }
+}
+
+```
+---
+
+### ③借阅图书（BorrowOperation）
+
+```java
+package operation;
+
+import book.Book;
+import book.BookList;
+
+import java.util.Scanner;
+
+public class BorrowOperation implements IOperation{
+    public void work(BookList bookList){
+        System.out.println("借阅图书！");
+        Scanner scan = new Scanner(System.in);
+        String name = scan.nextLine();;
+        System.out.println("请输入你要借阅的图书：");
+        int currentSize = bookList.getUsedSize();
+        for (int i = 0; i < currentSize; i++) {
+            Book book = bookList.getPos(i);
+            if(book.getName().equals(name)) {
+                System.out.println("找到了这本书，内容如下：");
+                System.out.println(book);
+                if(book.isBorrowed()) {
+                    System.out.println("抱歉，该书已被借出！");
+                    return;
+                    //如果已被借出，则结束本次借阅
+                } else {
+                    book.setBorrowed(true);
+                    System.out.println("借阅成功！");
+                    return;
+                }
+            }
+        }
+        System.out.println("没有你要借阅的图书！");
+    }
+}
+
+```
+---
+### ④删除图书（DelOperation）
+
+```java
+package operation;
+
+import book.Book;
+import book.BookList;
+
+import java.util.Scanner;
+
+public class DelOperation implements IOperation{
+    public void work(BookList bookList){
+        System.out.println("删除图书！");
+        System.out.println("请输入你要删除的图书：");
+        Scanner scan = new Scanner(System.in);
+        String name = scan.nextLine();
+        int currentSize = bookList.getUsedSize();
+        int index = 0;
+        int i = 0;
+        for ( ; i < currentSize; i++) {
+            Book book = bookList.getPos(i);
+            if(book.getName().equals(name)) {
+                System.out.println("找到了这本书，内容如下：");
+                System.out.println(book);
+                index = i;
+                break;
+            }
+        }
+        if(index == currentSize) {
+            System.out.println("要删除的这本书不存在！");
+            return;
+            //说明已经遍历完书架没找到这本书
+        } else {
+            for (int j = index; j < currentSize-1; j++) {
+                Book book = bookList.getPos(j+1);//先获取出来再赋值
+                bookList.setBooks(j,book);
+            }
+            bookList.setBooks(currentSize-1,null);
+            bookList.setUsedSize(currentSize-1);
+            System.out.println("删除成功！");
+        }
+    }
+}
+
+
+```
+---
+### ⑤退出系统 （ExitOperation）
+
+```java
+package operation;
+
+import book.BookList;
+
+public class ExitOperation implements IOperation {
+
+    public void work(BookList bookList) {
+
+        System.out.println("退出系统！");
+
+        int currentSize = bookList.getUsedSize();
+
+        for (int i = 0; i < currentSize; i++) {
+            bookList.setBooks(i,null);
+        }
+        //将书架中的所有书都置为空
+        System.exit(0);
+    }
+}
+
+```
+---
+### ⑥查找图书 （FindOperation）
+
+```java
+package operation;
+
+import book.Book;
+import book.BookList;
+
+import java.util.Scanner;
+
+public class FindOperation implements IOperation{
+    public void work(BookList bookList){
+        System.out.println("查找图书！");
+        System.out.println("请输入你要查找的图书：");
+        Scanner scan = new Scanner(System.in);
+        String name = scan.nextLine();
+        int currentSize = bookList.getUsedSize();
+        for (int i = 0; i < currentSize; i++) {
+            Book book = bookList.getPos(i);
+            if(book.getName().equals(name)) {
+                System.out.println("找到了这本书，内容如下：");
+                System.out.println(book);
+                return;
+            }
+        }
+        System.out.println("没有这本书！");
+    }
+}
+
+```
+
+---
+### ⑦归还图书 （ReturnOperation）
+
+```java
+package operation;
+
+import book.Book;
+import book.BookList;
+
+import java.util.Scanner;
+
+public class ReturnOperation implements IOperation {
+    public void work(BookList bookList){
+        System.out.println("归还图书！");
+        Scanner scan = new Scanner(System.in);
+        String name = scan.nextLine();;
+        System.out.println("请输入你要归还的图书：");
+        int currentSize = bookList.getUsedSize();
+        for (int i = 0; i < currentSize; i++) {
+            Book book = bookList.getPos(i);
+            if(book.getName().equals(name)) {
+                System.out.println("找到了这本书，内容如下：");
+                System.out.println(book);
+                book.setBorrowed(false);
+                //归还后，这本书的状态便设置为未借出！
+                System.out.println("归还成功！");
+                return;
+            }
+        }
+        System.out.println("没有你要归还的图书！");
+        //可能书架中并没有你要归还的这本书，比如这本书你是从其他处借阅的
+    }
+
+}
+
+```
+---
+### ⑧显示图书信息（ShowOperation）
+
+```java
+package operation;
+
+import book.Book;
+import book.BookList;
+
+public class ShowOperation implements IOperation{
+    public void work(BookList bookList){
+        System.out.println("显示图书信息！");
+        int currentSize = bookList.getUsedSize();
+        for (int i = 0; i < currentSize; i++) {
+            Book book = bookList.getPos(i);
+            System.out.println(book);
+        }
+    }
+}
+
+```
+---
+## 3.创建关于用户的一个包
+
+>其中有三个javaclass文件，一个普通用户（子类）和一个管理员（子类），以及一个user使用者（父类），父类中储存用户的共同信息
+> ![这里是引用](https://img-blog.csdnimg.cn/a771805824284754b63783d0044c0055.png)
+---
+### ①User（父类）
+
+```java
+package user;
+
+import book.BookList;
+import operation.IOperation;
+
+public abstract class User {
+    protected  String name;//protect目的是防止被其他包继承
+    //.......用户的更多属性
+    public IOperation[] iOperations;//不初始化，接口数组
+    //我们将不用身份用户所能进行的操作全部放入这个接口数组中
+    public User(String name) {
+        this.name = name;//构造函数
+    }
+    public abstract int menu();//菜单，不用用户引用的菜单menu不同，即为多态：同一个方法，
+    //因为调用这个方法的引用，引用对象不同，所执行的行为也是不同的。
+    public void doOperation(int choice,BookList bookList) {
+        iOperations[choice].work(bookList);
+    }
+    //接口数组中具体要进行的某一项操作
+}
+
+```
+---
+### ② AdminUser （子类）
+
+```java
+package user;
+
+import operation.*;
+
+import java.util.Scanner;
+
+public class AdminUser extends User {
+    public AdminUser(String name) {
+        super(name);//构造子类时，优先构造父类
+        this.iOperations = new IOperation[] {
+                new ExitOperation(),
+                new FindOperation(),
+                new AddOperation(),
+                new DelOperation(),
+                new ShowOperation()
+        };//将管理员能进行的操作都放入这个接口数组中
+    }
+    public int menu() {
+        System.out.println("hello "+this.name+" 欢迎来到图书小练习!");
+        System.out.println("1.查找图书");
+        System.out.println("2.新增图书");
+        System.out.println("3.删除图书");
+        System.out.println("4.显示图书");
+        System.out.println("0.退出系统");
+        System.out.println("请输入你要进行的操作：");//以上是管理员的菜单menu
+        Scanner a = new Scanner(System.in);
+        int choice = a.nextInt();
+        return choice;//返回我们要进行的操作给主函数
+    }
+}
+
+```
+---
+### ③NormalUser（子类）
+
+```java
+package user;
+
+import operation.*;
+
+import java.util.Scanner;
+
+public class NormalUser extends  User{
+    public NormalUser(String name) {
+        super(name);//当构造子类时，先构造父类的构造方法
+        this.iOperations = new IOperation[] {
+                new ExitOperation(),
+                new FindOperation(),
+                new BorrowOperation(),
+                new ReturnOperation()
+        };
+    }
+    public int menu() {
+        System.out.println("hello "+this.name+" 欢迎来到图书小练习!");
+        System.out.println("1.查找图书");
+        System.out.println("2.借阅图书");
+        System.out.println("3.归还图书");
+        System.out.println("0.退出系统");
+        System.out.println("请输入你要进行的操作：");//普通用户菜单menu
+        Scanner a = new Scanner(System.in);
+        int choice = a.nextInt();
+        return choice;//返回我们要进行的操作给主函数
+    }
+}
+
+```
+---
+## 4.主函数（Main方法）
+
+```java
+import book.BookList;
+import user.AdminUser;
+import user.NormalUser;
+import user.User;
+
+import java.util.Scanner;
+
+public class Main {
+    public static User login(){
+        System.out.println("请输入姓名： ");
+        Scanner scan = new Scanner(System.in);
+        String name = scan.nextLine();
+        System.out.println("请输入你的身份: 1->> 管理员,0->> 普通用户");
+        int choice = scan.nextInt();//选择身份
+        if(choice == 1) {
+            return new AdminUser(name);//创建一个管理员对象
+        } else {
+            return new NormalUser(name);//创建一个普通用户对象
+        }
+    }
+    public static void main(String[] args) {
+        BookList bookList = new BookList();
+        User user = login();//user 到底是谁？管理员or普通用户
+        while(true){
+            int choice = user.menu();
+            //怎么知道调用的是哪个菜单? ——>>user创建的用户所应的菜单
+            //接收菜单中要进行的操作
+            user.doOperation(choice,bookList);
+            //对书架实行对应的操作
+        }
+    }
+}
+
+```
+---
+
+# 三、总结——图书管理系统
+
+
+>   ————以上就是今天分享关于图书管理系统的内容，介绍了图书管理系统的大体框架，设计思路，包含的几部分内容，比如不同的用户、书与书架，不同用户所进行的不同操作，每一个操作都是怎样来实现的，和比较重要的一点是怎么样把不用用户进行的不同操作放在一起，我们使用了一个接口数组。
+>   ————通过这个图书管理系统，我们复习了java目前所学面向对象中的（继承、多态、接口等等知识），可以说是对java面向对象部分的一个总结性项目。
+>   ————之后对java的学习也应多多总结，多多回顾复习才好！
